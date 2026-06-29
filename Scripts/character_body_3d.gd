@@ -1,22 +1,9 @@
 extends CharacterBody3D
 
+@onready var camera_pivot: Node3D = $CameraPivot
 
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
-const SENSITIVITY = 0.005
-
-@onready var thirdPerson = $ThirdPerson
-@onready var cam = $ThirdPerson/Camera3D
-
-func _ready() -> void:
-	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-
-func _unhandled_input(event: InputEvent) -> void:
-	# Handle third person camera
-	if event is InputEventMouseMotion:
-		thirdPerson.rotate_y(-event.relative.x * SENSITIVITY)
-		cam.rotate_x(-event.relative.y * SENSITIVITY)
-		cam.rotation.x = clamp(cam.rotation.x, deg_to_rad(-40), deg_to_rad(60))
 
 func _physics_process(delta: float) -> void:
 	# Add the gravity.
@@ -28,9 +15,8 @@ func _physics_process(delta: float) -> void:
 		velocity.y = JUMP_VELOCITY
 
 	# Get the input direction and handle the movement/deceleration.
-	# As good practice, you should replace UI actions with custom gameplay actions.
 	var input_dir := Input.get_vector("walk-left", "walk-right", "walk-forward", "walk-backward")
-	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	var direction := (camera_pivot.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
